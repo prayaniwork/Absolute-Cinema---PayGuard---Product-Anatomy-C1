@@ -1,0 +1,482 @@
+<title>PayGuard Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: a guided tour. A numbered step rail and a one-paragraph narration sit above a browser frame that shows the real screen for that step. One visual language for freelancer and client; only the person and the URL change. */
+:root {
+  color-scheme: light;
+  --bg:#EEEEEA; --app:#F7F7F4; --surface:#FFFFFF; --text:#15181F; --muted:#636977; --line:#E6E6E0; --line-strong:#CFCFC7;
+  --accent:#1D4ED8; --accent-soft:#E8EFFE; --accent-ink:#1637A8;
+  --draft-t:#5A5F6B; --draft-f:#EEF0F2;
+  --funded-t:#1D4ED8; --funded-f:#E8EFFE;
+  --review-t:#6D28D9; --review-f:#EFE9FE;
+  --done-t:#176B3A; --done-f:#E1F5E8;
+  --warn-t:#9A5B00; --warn-f:#FFF1D6;
+  --err-t:#B42318; --err-f:#FDE8E6;
+  --font-ui:'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-fig:'JetBrains Mono', ui-monospace, monospace;
+  --r:14px; --r-ctl:10px;
+  --shadow:0 1px 2px rgba(21,24,31,.05), 0 6px 20px -10px rgba(21,24,31,.12);
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font-ui); font-size:14px; line-height:1.5; }
+h1,h2,h3,h4,p,ul { margin:0; padding:0; }
+ul { list-style:none; }
+button { font:inherit; color:inherit; cursor:pointer; }
+a { color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.fig { font-family:var(--font-fig); font-variant-numeric:tabular-nums; }
+.muted { color:var(--muted); }
+.wrap { max-width:1120px; margin:0 auto; padding-inline:16px; padding-block:20px 56px; }
+
+/* tour chrome */
+.tour-head { display:flex; flex-wrap:wrap; gap:4px 24px; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+.tour-head h1 { font-size:18px; font-weight:800; letter-spacing:-.01em; }
+.tour-head p { font-size:12px; color:var(--muted); }
+.rail { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:12px; scrollbar-width:thin; }
+.rail button { flex:none; display:flex; align-items:center; gap:8px; border:1px solid var(--line-strong); background:transparent; border-radius:999px; padding:6px 14px 6px 6px; font-size:12px; font-weight:600; color:var(--muted); }
+.rail .n { width:22px; height:22px; border-radius:50%; background:#DEDED7; color:var(--text); display:grid; place-items:center; font-size:12px; }
+.rail button[aria-current="step"] { background:var(--text); color:#fff; border-color:var(--text); }
+.rail button[aria-current="step"] .n { background:#fff; color:var(--text); }
+.rail button.done .n { background:var(--done-f); color:var(--done-t); }
+.narr { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:16px 32px; align-items:start; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px 20px; margin-bottom:16px; }
+.narr .who { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:2px 10px; border-radius:99px; background:var(--accent-soft); color:var(--accent-ink); margin-bottom:8px; }
+.narr h2 { font-size:18px; font-weight:800; letter-spacing:-.01em; margin-bottom:4px; text-wrap:balance; }
+.narr .why { border-left:3px solid var(--line-strong); padding-left:12px; color:var(--muted); font-size:14px; }
+.narr .why b { color:var(--text); display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+.nav { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+
+/* browser frame */
+.browser { background:var(--app); border:1px solid var(--line-strong); border-radius:var(--r); overflow:hidden; box-shadow:0 18px 50px -24px rgba(21,24,31,.4); }
+.chrome { display:flex; align-items:center; gap:12px; padding:10px 14px; background:#E9E9E4; border-bottom:1px solid var(--line-strong); }
+.dots { display:flex; gap:6px; } .dots i { width:10px; height:10px; border-radius:50%; background:#C7C7BF; }
+.url { flex:1; min-width:0; background:#F7F7F4; border-radius:8px; padding:4px 12px; font-size:12px; color:var(--muted); font-family:var(--font-fig); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.screen { min-height:560px; }
+
+/* app primitives */
+.topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 24px; background:var(--surface); border-bottom:1px solid var(--line); }
+.logo { display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:-.01em; }
+.logo .m { width:26px; height:26px; border-radius:8px; background:var(--accent); display:grid; place-items:center; }
+.logo .m svg { width:15px; height:15px; fill:#fff; }
+.who-chip { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+.avatar { width:28px; height:28px; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink); display:grid; place-items:center; font-weight:700; font-size:12px; }
+.avatar.b { background:#FFE9D6; color:#8A4B12; }
+.page { padding:24px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); }
+.pad { padding:20px; }
+.label { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.btn { border:1px solid var(--line-strong); background:var(--surface); border-radius:var(--r-ctl); padding:10px 18px; font-weight:700; font-size:14px; }
+.btn:hover { border-color:var(--text); }
+.btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.btn.primary:hover { background:var(--accent-ink); }
+.btn.primary:disabled { opacity:.45; cursor:not-allowed; }
+.btn.lg { padding:14px 24px; font-size:18px; }
+.btn.block { width:100%; }
+.btn.ghost { border-color:transparent; background:transparent; color:var(--muted); }
+.pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:2px 10px; border-radius:99px; white-space:nowrap; }
+.pill::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.st-draft{color:var(--draft-t);background:var(--draft-f)} .st-funded{color:var(--funded-t);background:var(--funded-f)}
+.st-submitted{color:var(--review-t);background:var(--review-f)} .st-released{color:var(--done-t);background:var(--done-f)}
+.field { display:grid; gap:4px; }
+.field label { font-size:12px; font-weight:700; color:var(--muted); }
+.field input, .field textarea { font:inherit; padding:10px 12px; border:1px solid var(--line-strong); border-radius:var(--r-ctl); background:#fff; color:var(--text); width:100%; }
+.field input:focus, .field textarea:focus { border-color:var(--accent); outline:2px solid var(--accent-soft); }
+.banner { display:flex; gap:12px; align-items:center; padding:12px 16px; border-radius:var(--r-ctl); background:var(--done-f); color:var(--done-t); font-weight:600; }
+.banner svg, .tick { width:18px; height:18px; flex:none; }
+.grid2 { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:24px; align-items:start; }
+.stack { display:grid; gap:16px; }
+
+/* 1 landing */
+.land { padding:56px 24px 48px; text-align:center; max-width:760px; margin:0 auto; }
+.land h2 { font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.025em; text-wrap:balance; }
+.land p.sub { font-size:18px; color:var(--muted); margin:16px auto 24px; max-width:560px; text-wrap:pretty; }
+.chain { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:48px auto 0; text-align:left; }
+.chain li { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px; }
+.chain li b { display:block; font-size:14px; }
+.chain li span { font-size:12px; color:var(--muted); }
+.chain li i { font-style:normal; font-size:12px; font-weight:800; color:var(--accent); font-family:var(--font-fig); }
+
+/* 2 profile */
+.center { max-width:520px; margin:0 auto; }
+.center h2 { font-size:28px; font-weight:800; letter-spacing:-.02em; line-height:1.15; margin-bottom:4px; }
+.swatches { display:flex; gap:10px; }
+.sw { width:32px; height:32px; border-radius:50%; border:3px solid transparent; outline:1px solid var(--line-strong); cursor:pointer; }
+.sw[aria-pressed="true"] { border-color:#fff; outline:2px solid var(--text); }
+.plain { display:grid; gap:8px; margin:4px 0; }
+.plain li { display:grid; grid-template-columns:auto 1fr; gap:10px; }
+.plain li::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-top:8px; }
+.check { display:flex; gap:10px; align-items:flex-start; font-size:14px; }
+.check input { margin-top:4px; width:16px; height:16px; accent-color:var(--accent); }
+
+/* 3 plan */
+.mrow { display:grid; grid-template-columns:24px minmax(0,1.6fr) minmax(0,.9fr) minmax(0,1fr); gap:8px 12px; align-items:end; padding:12px 0; border-top:1px solid var(--line); }
+.mrow:first-of-type { border-top:0; }
+.mrow .idx { font-family:var(--font-fig); font-weight:700; color:var(--muted); padding-bottom:10px; }
+.rules { display:flex; flex-wrap:wrap; gap:8px; }
+.rules span { background:var(--draft-f); border-radius:99px; padding:4px 12px; font-size:12px; font-weight:600; }
+.warn { color:var(--warn-t); background:var(--warn-f); padding:8px 12px; border-radius:var(--r-ctl); font-size:12px; font-weight:600; }
+.warn[hidden] { display:none; }
+
+/* calendar */
+.cal { padding:16px; }
+.cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.cal-head b { font-size:14px; font-weight:800; }
+.cal-head button { width:28px; height:28px; border-radius:8px; border:1px solid var(--line); background:var(--surface); line-height:1; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; }
+.cal-grid .dow { font-size:12px; color:var(--muted); font-weight:600; padding-bottom:4px; }
+.day { aspect-ratio:1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; gap:2px; position:relative; font-family:var(--font-fig); }
+.day.out { color:#B4B6BD; }
+.day.today { outline:2px solid var(--text); outline-offset:-2px; font-weight:700; }
+.day.ev { font-weight:800; }
+.day.ev.due-draft { background:var(--draft-f); } .day.ev.due-funded { background:var(--funded-f); color:var(--funded-t); }
+.day.ev.due-submitted { background:var(--review-f); color:var(--review-t); } .day.ev.due-released { background:var(--done-f); color:var(--done-t); }
+.day.ev i { width:5px; height:5px; border-radius:50%; background:currentColor; }
+.day.rv::after { content:""; position:absolute; bottom:4px; width:9px; height:9px; border-radius:50%; border:2px dashed var(--review-t); }
+.agenda { display:grid; gap:2px; padding:0 16px 16px; }
+.agenda li { display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; align-items:center; padding:8px 0; border-top:1px solid var(--line); }
+.agenda .dt { text-align:center; line-height:1.1; }
+.agenda .dt b { display:block; font-size:18px; font-weight:800; font-family:var(--font-fig); }
+.agenda .dt span { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+.agenda .t { font-weight:700; }
+.agenda .s { font-size:12px; color:var(--muted); }
+.agenda .rel { font-size:12px; font-weight:700; color:var(--muted); }
+.legend { display:flex; flex-wrap:wrap; gap:4px 12px; padding:0 16px 12px; font-size:12px; color:var(--muted); }
+.legend span::before { content:""; display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:6px; background:var(--funded-f); border:1px solid var(--funded-t); }
+.legend span.rv::before { background:transparent; border:2px dashed var(--review-t); border-radius:50%; }
+
+/* milestone list */
+.ml { display:grid; }
+.ml li { display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:12px; align-items:center; padding:12px 0; border-top:1px solid var(--line); }
+.ml li:first-child { border-top:0; }
+.ml .n { width:28px; height:28px; border-radius:50%; background:var(--draft-f); display:grid; place-items:center; font-weight:800; font-size:12px; font-family:var(--font-fig); }
+.ml li.cur .n { background:var(--accent); color:#fff; }
+.ml .nm { font-weight:700; }
+.ml .sub { font-size:12px; color:var(--muted); }
+.ml .rt { text-align:right; display:grid; gap:4px; justify-items:end; }
+
+/* upload hero */
+.hero { padding:24px; }
+.hero h2 { font-size:28px; font-weight:800; letter-spacing:-.02em; line-height:1.15; text-wrap:balance; }
+.countdown { display:inline-flex; gap:8px; align-items:center; font-weight:700; color:var(--warn-t); background:var(--warn-f); border-radius:99px; padding:2px 12px; font-size:12px; }
+.drop { margin-top:20px; border:2px dashed var(--accent); border-radius:var(--r); background:var(--accent-soft); padding:40px 24px; text-align:center; display:grid; gap:8px; justify-items:center; width:100%; cursor:pointer; color:var(--text); transition:background .15s; }
+.drop:hover { background:#DCE7FD; }
+.drop svg { width:36px; height:36px; stroke:var(--accent); fill:none; stroke-width:1.6; }
+.drop b { font-size:18px; }
+.files { margin-top:20px; display:grid; gap:8px; }
+.file { display:grid; grid-template-columns:36px minmax(0,1fr) auto; gap:12px; align-items:center; padding:10px 12px; border:1px solid var(--line); border-radius:var(--r-ctl); background:#fff; }
+.file .ic { width:36px; height:36px; border-radius:8px; background:var(--draft-f); display:grid; place-items:center; font-size:12px; font-weight:800; font-family:var(--font-fig); }
+.file .bar { height:6px; border-radius:99px; background:var(--draft-f); overflow:hidden; margin-top:6px; }
+.file .bar i { display:block; height:100%; width:0; background:var(--accent); animation:fill 1.1s ease-out forwards; }
+@keyframes fill { to { width:100%; } }
+.ok { color:var(--done-t); font-weight:700; font-size:12px; display:flex; gap:6px; align-items:center; }
+.submitbar { margin-top:16px; display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center; justify-content:space-between; padding:16px; border-radius:var(--r); background:var(--surface); border:1px solid var(--line-strong); }
+
+/* review */
+.stage { position:relative; aspect-ratio:16/10; border-radius:12px; overflow:hidden; background:#EFEFEA; user-select:none; }
+.stage svg { width:100%; height:100%; display:block; }
+.wm { position:absolute; inset:-50%; display:grid; grid-template-columns:repeat(4,1fr); transform:rotate(-24deg); pointer-events:none; align-content:space-around; }
+.wm span { font-size:12px; font-weight:800; letter-spacing:.14em; color:rgba(21,24,31,.2); white-space:nowrap; padding:26px 0; text-align:center; }
+.kv { display:grid; gap:8px; }
+.kv div { display:flex; justify-content:space-between; gap:12px; }
+.kv .tot { border-top:1px solid var(--line); padding-top:8px; font-weight:800; }
+.reassure { display:flex; gap:10px; font-size:12px; color:var(--muted); }
+.reassure svg { width:16px; height:16px; flex:none; fill:var(--done-t); margin-top:2px; }
+
+/* receipt */
+.sheet { background:#fff; border:1px solid var(--line-strong); border-radius:8px; padding:20px; font-family:var(--font-fig); font-size:12px; position:relative; }
+.sheet h4 { font-family:var(--font-ui); font-size:18px; font-weight:800; margin-bottom:4px; }
+.sheet hr { border:0; border-top:1px dashed var(--line-strong); margin:12px 0; }
+.sheet .ln { display:flex; justify-content:space-between; gap:12px; padding:2px 0; }
+.sheet .ln.t { font-weight:700; font-size:14px; border-top:1px solid var(--text); margin-top:6px; padding-top:6px; }
+.stamp { position:absolute; right:16px; top:16px; transform:rotate(-8deg); border:2px solid var(--done-t); color:var(--done-t); border-radius:6px; padding:0 10px; font-weight:800; letter-spacing:.16em; font-size:12px; }
+.split { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; align-items:start; }
+.view-label { display:inline-flex; gap:8px; align-items:center; font-weight:800; margin-bottom:12px; }
+
+@media (max-width:860px) {
+  .narr, .grid2, .split { grid-template-columns:minmax(0,1fr); }
+  .chain { grid-template-columns:minmax(0,1fr); }
+  .land h2 { font-size:28px; }
+  .page { padding:16px; } .topbar { padding-inline:16px; }
+  .mrow { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .mrow .idx { display:none; } .mrow .nm { grid-column:1 / -1; }
+}
+@media (prefers-reduced-motion:reduce) { .file .bar i { animation-duration:.01s; } html { scroll-behavior:auto; } }
+</style>
+
+<div class="wrap">
+  <header class="tour-head">
+    <h1>PayGuard · how it feels, start to finish</h1>
+    <p>Click through the nine steps or use ← → keys. Names, dates and amounts are examples.</p>
+  </header>
+  <nav class="rail" id="rail" aria-label="Walkthrough steps"></nav>
+  <section class="narr" id="narr" aria-live="polite"></section>
+  <div class="browser">
+    <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url" id="url"></div></div>
+    <div class="screen" id="screen"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* ---------- helpers ---------- */
+  var TODAY = new Date(2026, 9, 2);
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function parse(s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function same(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+  function fmt(d, o) { return d.toLocaleDateString('en-IN', o); }
+  function long(d) { return fmt(d, { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function inr(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+  function days(d) { return Math.round((d - TODAY) / 86400000); }
+  function rel(d) { var n = days(d); return n === 0 ? 'today' : n === 1 ? 'tomorrow' : n < 0 ? Math.abs(n) + ' days ago' : 'in ' + n + ' days'; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  var ICON = {
+    shield: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v7c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>',
+    check: '<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+    upload: '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>'
+  };
+  var LOGO = '<span class="logo"><span class="m">' + ICON.shield + '</span>PayGuard</span>';
+  var BRANDS = ['#1D4ED8', '#0F766E', '#B4532A', '#7C3AED'];
+  var ST = { draft: 'Not funded yet', funded: 'Funded', submitted: 'In review', released: 'Released' };
+
+  /* ---------- state ---------- */
+  var S = {
+    step: 1, m1: 'draft', uploaded: false, uploading: false, rc: false, rcSent: false, busy: false, agree: false, brand: 0,
+    calMonth: new Date(2026, 9, 1),
+    ms: [
+      { name: 'Discovery and moodboard', amount: 25000, due: '2026-10-09' },
+      { name: 'Logo concepts', amount: 40000, due: '2026-10-23' },
+      { name: 'Brand guidelines', amount: 35000, due: '2026-11-13' },
+      { name: 'Collateral set', amount: 20000, due: '2026-11-27' }
+    ]
+  };
+  function statusOf(i) { return i === 0 ? S.m1 : 'draft'; }
+  function total() { return S.ms.reduce(function (a, m) { return a + (Number(m.amount) || 0); }, 0); }
+
+  /* ---------- calendar ---------- */
+  function events() {
+    var out = [];
+    S.ms.forEach(function (m, i) {
+      if (!m.due) return;
+      var d = parse(m.due);
+      out.push({ date: d, kind: 'due', i: i, label: m.name, st: statusOf(i) });
+      if (statusOf(i) === 'submitted') out.push({ date: addDays(d, 3), kind: 'review', i: i, label: 'Review window closes', sub: m.name, st: 'submitted' });
+    });
+    return out.sort(function (a, b) { return a.date - b.date; });
+  }
+  function calendar() {
+    var m = S.calMonth, first = new Date(m.getFullYear(), m.getMonth(), 1);
+    var lead = (first.getDay() + 6) % 7, start = addDays(first, -lead), ev = events(), cells = '';
+    ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach(function (d) { cells += '<div class="dow">' + d + '</div>'; });
+    for (var k = 0; k < 42; k++) {
+      var d = addDays(start, k);
+      if (k >= 35 && d.getMonth() !== m.getMonth()) break;
+      var due = ev.filter(function (e) { return e.kind === 'due' && same(e.date, d); })[0];
+      var rv = ev.filter(function (e) { return e.kind === 'review' && same(e.date, d); })[0];
+      var cls = 'day' + (d.getMonth() !== m.getMonth() ? ' out' : '') + (same(d, TODAY) ? ' today' : '') + (due ? ' ev due-' + due.st : '') + (rv ? ' rv' : '');
+      var tip = due ? due.label + ' due' : rv ? rv.label : '';
+      cells += '<div class="' + cls + '"' + (tip ? ' title="' + esc(tip) + '"' : '') + '>' + d.getDate() + (due ? '<i></i>' : '') + '</div>';
+    }
+    var up = ev.filter(function (e) { return e.date >= TODAY; }).slice(0, 4);
+    var ag = up.map(function (e) {
+      var sub = e.kind === 'due' ? (e.i === 0 && S.m1 !== 'draft' ? ST[S.m1] : 'Milestone ' + (e.i + 1)) : e.sub;
+      return '<li><div class="dt"><b>' + e.date.getDate() + '</b><span>' + fmt(e.date, { month: 'short' }) + '</span></div><div><div class="t">' + esc(e.label) + '</div><div class="s">' + sub + '</div></div><div class="rel">' + rel(e.date) + '</div></li>';
+    }).join('');
+    return '<div class="cal"><div class="cal-head"><button data-action="calnav" data-dir="-1" aria-label="Previous month">‹</button><b>' + fmt(m, { month: 'long', year: 'numeric' }) + '</b><button data-action="calnav" data-dir="1" aria-label="Next month">›</button></div><div class="cal-grid">' + cells + '</div></div>' +
+      '<div class="legend"><span>Delivery date</span>' + (ev.some(function (e) { return e.kind === 'review'; }) ? '<span class="rv">Review window closes</span>' : '') + '</div><ul class="agenda">' + ag + '</ul>';
+  }
+  function refreshCal() { var el = document.getElementById('calbox'); if (el) el.innerHTML = calendar(); }
+
+  /* ---------- screens ---------- */
+  function topbarFree(project) { return '<div class="topbar">' + LOGO + '<div class="who-chip">' + (project ? '<span>' + esc(project) + '</span>' : '') + '<span class="avatar">MI</span></div></div>'; }
+  function topbarClient() { return '<div class="topbar"><span class="logo"><span class="m" style="background:' + BRANDS[S.brand] + '">' + ICON.shield + '</span>Meera Iyer Studio</span><div class="who-chip"><span>Arjun Rao · guest, no account</span><span class="avatar b">AR</span></div></div>'; }
+
+  function msList(mode) {
+    return '<ul class="ml">' + S.ms.map(function (m, i) {
+      var st = statusOf(i), cur = i === 0;
+      return '<li class="' + (cur ? 'cur' : '') + '"><span class="n">' + (i + 1) + '</span><div><div class="nm">' + esc(m.name) + '</div><div class="sub">Due ' + long(parse(m.due)) + (mode === 'client' || mode === 'free' ? ' · ' + inr(m.amount) : '') + '</div></div><div class="rt"><span class="pill st-' + st + '">' + ST[st] + '</span></div></li>';
+    }).join('') + '</ul>';
+  }
+
+  var SCREENS = {
+    1: function () {
+      return '<div class="topbar">' + LOGO + '<div class="who-chip"><a href="#" data-action="noop">Sign in</a></div></div>' +
+        '<div class="land"><p class="label" style="margin-bottom:16px">For freelancers with clients who say yes</p>' +
+        '<h2>Agree on the work once. Get paid when it\'s approved.</h2>' +
+        '<p class="sub">One link for your client. Dates, files, approval and payment all live in it, so nothing slips into a chat thread.</p>' +
+        '<button class="btn primary lg" data-action="next">Start a project</button><p class="muted" style="margin-top:12px;font-size:12px">Takes about two minutes. Your client never needs an account.</p>' +
+        '<ul class="chain"><li><i>01</i><b>Plan the dates</b><span>Milestones, amounts, deadlines</span></li><li><i>02</i><b>Client funds it</b><span>Before you start work</span></li><li><i>03</i><b>You upload</b><span>Protected, watermarked preview</span></li><li><i>04</i><b>They approve</b><span>One click, on a clear date</span></li><li><i>05</i><b>You\'re paid</b><span>Receipt and files unlocked</span></li></ul></div>';
+    },
+    2: function () {
+      return topbarFree() + '<div class="page"><div class="center stack"><div><p class="label">Step 1 of 2</p><h2>Let\'s set up your studio</h2><p class="muted">This is what your client sees at the top of every link.</p></div>' +
+        '<div class="card pad stack"><div class="field"><label for="nm">Your name</label><input id="nm" value="Meera Iyer"></div><div class="field"><label for="bz">Studio or business name</label><input id="bz" value="Meera Iyer Studio"></div>' +
+        '<div class="field"><label>Your color</label><div class="swatches">' + BRANDS.map(function (c, i) { return '<button class="sw" data-action="brand" data-i="' + i + '" aria-pressed="' + (S.brand === i) + '" aria-label="Color ' + (i + 1) + '" style="background:' + c + '"></button>'; }).join('') + '</div></div></div>' +
+        '<div class="card pad stack"><h3 style="font-size:14px;font-weight:800">What you\'re agreeing to, in plain words</h3><ul class="plain muted"><li>PayGuard connects you and your client. We don\'t hold your money or do the work.</li><li>Original files stay locked for the client until a milestone is paid and approved.</li><li>Rights to the work pass to the client when they approve and pay.</li><li>We store only what we need, and you can delete your data any time.</li></ul>' +
+        '<label class="check"><input type="checkbox" id="agree"' + (S.agree ? ' checked' : '') + '><span>I agree to the <a href="#" data-action="noop">Terms</a> and the <a href="#" data-action="noop">data policy</a>.</span></label></div>' +
+        '<button class="btn primary lg" id="cont" data-action="next"' + (S.agree ? '' : ' disabled') + '>Continue</button></div></div>';
+    },
+    3: function () {
+      var rows = S.ms.map(function (m, i) {
+        return '<div class="mrow"><span class="idx">' + (i + 1) + '</span><div class="field nm"><label for="mn' + i + '">Milestone</label><input id="mn' + i + '" data-ms="' + i + '" data-f="name" value="' + esc(m.name) + '"></div>' +
+          '<div class="field"><label for="ma' + i + '">Amount (₹)</label><input id="ma' + i + '" class="fig" inputmode="numeric" data-ms="' + i + '" data-f="amount" value="' + m.amount + '"></div>' +
+          '<div class="field"><label for="md' + i + '">Delivery date</label><input id="md' + i + '" type="date" data-ms="' + i + '" data-f="due" value="' + m.due + '"></div></div>';
+      }).join('');
+      return topbarFree() + '<div class="page"><div class="grid2"><div class="stack"><div><p class="label">Step 2 of 2</p><h2 style="font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15">Plan the project</h2><p class="muted">Pick the dates. They appear on both calendars, so nobody has to ask.</p></div>' +
+        '<div class="card pad stack"><div class="field"><label for="pn">Project</label><input id="pn" value="Kiln &amp; Co. brand identity"></div><div class="field"><label for="ce">Client email</label><input id="ce" type="email" value="arjun@kilnandco.example"></div></div>' +
+        '<div class="card pad"><div class="label" style="margin-bottom:4px">Milestones and dates</div>' + rows + '<p class="warn" id="datewarn" hidden>Dates should go in order, earliest first.</p></div>' +
+        '<div class="card pad stack"><div class="label">Defaults for every milestone</div><div class="rules"><span>Client reviews within 3 days</span><span>2 rounds of changes included</span><span>Funded before you start</span></div></div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:12px">Total <b class="fig" id="tot">' + inr(total()) + '</b> across 4 milestones</span><button class="btn primary lg" data-action="next">Create project and invite Arjun</button></div></div>' +
+        '<aside class="card" id="calbox" style="position:sticky;top:16px">' + calendar() + '</aside></div></div>';
+    },
+    4: function () {
+      return topbarClient() + '<div class="page"><div class="grid2"><div class="stack"><div><p class="label">An invitation from Meera Iyer</p><h2 style="font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-top:4px">Kiln &amp; Co. brand identity</h2><p class="muted" style="margin-top:4px">Hi Arjun. Here\'s the plan Meera put together. Everything for this project happens on this page.</p></div>' +
+        '<div class="card pad"><div class="label" style="margin-bottom:4px">The four milestones</div>' + msList('client') + '</div>' +
+        '<div class="card pad stack"><div class="label">How it works for you</div><ul class="plain"><li>You pay for one milestone at a time, before Meera starts it.</li><li>You get a watermarked preview and <b>' + 3 + ' days</b> to approve or ask for changes.</li><li>Approving unlocks the original files and sends you a tax invoice.</li></ul></div>' +
+        '<div><button class="btn primary lg" data-action="next">Fund the first milestone · ' + inr(S.ms[0].amount) + '</button><p class="muted" style="font-size:12px;margin-top:8px">No account needed. You can pay by card or UPI.</p></div></div>' +
+        '<aside class="card"><div class="label" style="padding:16px 16px 0">Dates agreed</div>' + calendar() + '</aside></div></div>';
+    },
+    5: function () {
+      var f = Math.round(S.ms[0].amount * 0.055), g = Math.round(f * 0.18);
+      return topbarClient() + '<div class="page"><div class="center stack"><div><p class="label">Milestone 1 of 4</p><h2>' + esc(S.ms[0].name) + '</h2><p class="muted">Meera starts as soon as this is paid. The money is released to her when you approve.</p></div>' +
+        '<div class="card pad kv"><div><span class="muted">Milestone</span><span class="fig">' + inr(S.ms[0].amount) + '</span></div><div><span class="muted">PayGuard fee (example 5.5%)</span><span class="fig">' + inr(f) + '</span></div><div><span class="muted">GST on fee</span><span class="fig">' + inr(g) + '</span></div><div class="tot"><span>You pay today</span><span class="fig">' + inr(S.ms[0].amount + f + g) + '</span></div></div>' +
+        '<form class="card pad stack" id="payform"><div class="field"><label for="em">Email for your receipt</label><input id="em" type="email" value="arjun@kilnandco.example"></div><div class="field"><label for="cn">Card number</label><input id="cn" class="fig" value="4242 4242 4242 4242"></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="ex">Expiry</label><input id="ex" class="fig" value="09 / 29"></div><div class="field"><label for="cv">CVC</label><input id="cv" class="fig" value="123"></div></div>' +
+        '<button type="submit" class="btn primary lg block" data-action="pay"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Paying…' : 'Pay ' + inr(S.ms[0].amount + f + g)) + '</button>' +
+        '<p class="reassure">' + ICON.shield + '<span>Card details go straight to the payment provider. PayGuard never sees them. By paying you accept the terms.</span></p></form></div></div>';
+    },
+    6: function () { return freeHome(); },
+    7: function () { return freeHome(); },
+    8: function () {
+      var due = parse(S.ms[0].due), close = addDays(due, 3);
+      return topbarClient() + '<div class="page"><div class="grid2"><div class="stack"><div style="display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:end"><div><p class="label">Milestone 1 of 4</p><h2 style="font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15">' + esc(S.ms[0].name) + '</h2></div><span class="pill st-submitted">Waiting for you</span></div>' +
+        '<div class="card pad">' + moodboard() + '<p class="muted" style="font-size:12px;margin-top:12px"><b style="color:var(--text)">View only for now.</b> The watermark comes off and downloads unlock when you approve. 3 files: Moodboard, References, Notes.</p></div></div>' +
+        '<aside class="card pad stack" style="position:sticky;top:16px"><div><p class="label">Reply by</p><p style="font-size:28px;font-weight:800;line-height:1.15;letter-spacing:-.02em">' + long(close) + '</p><p class="muted">3 days from delivery. We\'ll remind you the day before.</p></div>' +
+        '<div class="kv"><div><span class="muted">Pays</span><b>Meera Iyer</b></div><div><span class="muted">Releases</span><b class="fig">' + inr(S.ms[0].amount) + '</b></div><div><span class="muted">Unlocks</span><b>Original files</b></div></div>' +
+        (S.rc ? '<div class="field"><label for="note">What should change?</label><textarea id="note" rows="4">The palette feels a little cold. Can we try warmer clay tones?</textarea></div><button class="btn primary block" data-action="sendrc">Send to Meera</button><button class="btn ghost block" data-action="rc">Cancel</button>'
+          : '<div class="stack" style="gap:8px"><button class="btn primary lg block" data-action="next">Approve and release ' + inr(S.ms[0].amount) + '</button><button class="btn block" data-action="rc">Ask for changes · 2 rounds left</button></div>') +
+        (S.rcSent ? '<p class="banner" style="font-size:12px">' + ICON.check + 'Sent. In the real flow Meera revises, resubmits, and your review date resets.</p>' : '') +
+        '<p class="reassure">' + ICON.shield + '<span>This money was paid before work began. It reaches Meera only when you approve.</span></p></aside></div></div>';
+    },
+    9: function () {
+      var f = Math.round(S.ms[0].amount * 0.055), g = Math.round(f * 0.18), paid = S.ms[0].amount + f + g;
+      return '<div class="page"><div class="split"><div><div class="view-label"><span class="avatar b">AR</span>What Arjun sees</div><div class="card pad stack">' +
+        '<div class="banner">' + ICON.check + 'Released. The original files are yours.</div>' +
+        '<div class="files" style="margin:0"><div class="file"><span class="ic">PDF</span><div><b>Moodboard</b><div class="muted" style="font-size:12px">Original · 18 MB</div></div><button class="btn" data-action="noop">Download</button></div><div class="file"><span class="ic">ZIP</span><div><b>References</b><div class="muted" style="font-size:12px">Original · 42 MB</div></div><button class="btn" data-action="noop">Download</button></div></div>' +
+        '<div class="sheet"><span class="stamp">PAID</span><h4>Receipt</h4><div class="muted">RCT-2026-0014 · ' + fmt(TODAY, { day: 'numeric', month: 'short', year: 'numeric' }) + '</div><hr><div class="ln"><span>Milestone 1 · ' + esc(S.ms[0].name) + '</span><span>' + inr(S.ms[0].amount) + '</span></div><div class="ln"><span>Fee + GST</span><span>' + inr(f + g) + '</span></div><div class="ln t"><span>Paid</span><span>' + inr(paid) + '</span></div><hr><div class="muted">Funded → delivered → approved → released. Tax invoice sent to arjun@kilnandco.example.</div></div></div></div>' +
+        '<div><div class="view-label"><span class="avatar">MI</span>What Meera sees</div><div class="card pad stack">' +
+        '<div class="banner">' + ICON.check + '<span>' + inr(S.ms[0].amount) + ' released to you</span></div>' +
+        '<div><p class="label">Milestone 1</p><p style="font-size:18px;font-weight:800">' + esc(S.ms[0].name) + ' <span class="pill st-released" style="margin-left:8px">Released</span></p><p class="muted">Approved with 2 days to spare.</p></div>' +
+        '<div><p class="label" style="margin-bottom:4px">Up next</p><ul class="ml"><li class="cur"><span class="n">2</span><div><div class="nm">' + esc(S.ms[1].name) + '</div><div class="sub">Due ' + long(parse(S.ms[1].due)) + ' · ' + rel(parse(S.ms[1].due)) + '</div></div><div class="rt"><span class="pill st-draft">Waiting for funding</span></div></li></ul></div>' +
+        '<button class="btn primary block" data-action="noop">Remind Arjun to fund milestone 2</button></div></div></div></div>';
+    }
+  };
+
+  function freeHome() {
+    var m = S.ms[0], due = parse(m.due), n = days(due);
+    var hero;
+    if (S.step === 6 && !S.uploading) {
+      hero = '<div class="card hero"><div style="display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center"><p class="label">Next up · milestone 1</p><span class="countdown">Due ' + long(due) + ' · ' + n + ' days left</span></div>' +
+        '<h2 style="margin-top:8px">' + esc(m.name) + '</h2><p class="muted">Add your work here. Clients only ever see a watermarked preview until they approve.</p>' +
+        '<button class="drop" data-action="uploadstart">' + ICON.upload + '<b>Drop files here, or choose from your computer</b><span class="muted">Images, PDFs, video, documents · up to 2 GB each</span></button></div>';
+    } else {
+      var names = [['PDF', 'Moodboard.pdf', '18 MB'], ['ZIP', 'References.zip', '42 MB'], ['DOC', 'Notes.docx', '120 KB']];
+      var done = S.step === 7;
+      hero = '<div class="card hero"><div style="display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center"><p class="label">Milestone 1 · ' + (done ? 'ready to submit' : 'uploading') + '</p><span class="countdown">Due ' + long(due) + ' · ' + n + ' days left</span></div><h2 style="margin-top:8px">' + esc(m.name) + '</h2>' +
+        '<div class="files">' + names.map(function (f) {
+          return '<div class="file"><span class="ic">' + f[0] + '</span><div><b>' + f[1] + '</b> <span class="muted" style="font-size:12px">' + f[2] + '</span>' + (done ? '' : '<div class="bar"><i></i></div>') + '</div>' + (done ? '<span class="ok">' + ICON.check + 'Protected preview ready</span>' : '<span class="muted" style="font-size:12px">Uploading</span>') + '</div>';
+        }).join('') + '</div>' +
+        (done ? '<div class="submitbar"><div><b>Arjun gets until ' + long(addDays(due, 3)) + ' to reply.</b><div class="muted" style="font-size:12px">He sees a watermarked, view-only copy. 2 rounds of changes included.</div></div><button class="btn primary lg" data-action="next">Submit for review</button></div>' : '') + '</div>';
+    }
+    return topbarFree('Kiln &amp; Co. brand identity') + '<div class="page"><div class="grid2"><div class="stack">' +
+      (S.step === 6 && !S.uploading ? '<div class="banner">' + ICON.check + 'Arjun funded this milestone. You\'re clear to start.</div>' : '') +
+      '<div><h2 style="font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15">Good morning, Meera</h2><p class="muted">One thing needs you today.</p></div>' + hero +
+      '<div class="card pad"><div class="label" style="margin-bottom:4px">All milestones</div>' + msList('free') + '</div></div>' +
+      '<aside class="card" id="calbox" style="position:sticky;top:16px">' + calendar() + '</aside></div></div>';
+  }
+
+  function moodboard() {
+    return '<div class="stage"><svg viewBox="0 0 640 400" role="img" aria-label="Preview of the moodboard with clay colors and shapes"><rect width="640" height="400" fill="#F2EEE7"/>' +
+      '<rect x="32" y="32" width="250" height="200" rx="6" fill="#B4532A"/><circle cx="157" cy="132" r="56" fill="#E8A33D"/><rect x="298" y="32" width="150" height="96" rx="6" fill="#2A211C"/><rect x="464" y="32" width="144" height="96" rx="6" fill="#D9C7B0"/>' +
+      '<rect x="298" y="144" width="310" height="88" rx="6" fill="#8C9A7E"/><path d="M32 360 q80 -90 160 0 t160 0 t160 0 t96 0" fill="none" stroke="#2A211C" stroke-width="6"/>' +
+      '<text x="32" y="270" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22" fill="#2A211C">Warm, handmade, quietly precise</text><text x="32" y="294" font-family="Plus Jakarta Sans, sans-serif" font-size="14" fill="#6C5E55">Direction A · clay, ember, ink</text></svg>' +
+      '<div class="wm" aria-hidden="true">' + new Array(17).join('<span>PREVIEW · PAYGUARD</span>') + '</div></div>';
+  }
+
+  /* ---------- narration ---------- */
+  var STEPS = [
+    null,
+    { rail: 'Land', who: 'Meera · freelancer', url: 'payguard.app', title: 'She arrives knowing what she gets', why: 'The page promises an outcome (agree once, get paid on approval) and shows the five-step chain. No pricing wall, no feature grid. The client is mentioned early so she knows she won\'t be asking them to sign up.' },
+    { rail: 'Set up', who: 'Meera · freelancer', url: 'payguard.app/welcome', title: 'Two minutes of setup, with the terms in plain words', why: 'The legal agreement is summarised in four lines before the checkbox. Her name and color become the header her client sees, so the client side feels like her studio, not ours.' },
+    { rail: 'Plan', who: 'Meera · freelancer', url: 'payguard.app/new', title: 'Dates are fixed here, and visible right away', why: 'Change a date and the calendar on the right moves. Defaults (3-day review, 2 change rounds, funded first) are shown as chips, not buried in a contract. The total is a quiet footnote: the amounts are already agreed, the dates are what needs her attention.' },
+    { rail: 'Client opens', who: 'Arjun · client', url: 'payguard.app/p/kiln-x7', title: 'The client lands on a plan, not a login', why: 'The invitation is a link. He sees the same milestones and the same calendar Meera built, and the one thing he can do: fund the first milestone. Same look as Meera\'s screens, so nothing feels like a different product.' },
+    { rail: 'Fund', who: 'Arjun · client', url: 'payguard.app/p/kiln-x7/fund/1', title: 'Paying is the first trust moment', why: 'The line items add up in front of him before he enters a card. A single sentence says when the money moves. Card entry is the payment provider\'s hosted field in the real build.' },
+    { rail: 'Start work', who: 'Meera · freelancer', url: 'payguard.app/projects/kiln', title: 'Her home is one job: upload the next thing', why: 'The contract budget is gone from the top. What she needs when she opens the app is the next deadline and a large drop zone. The calendar is always beside her so deadlines never surprise her.' },
+    { rail: 'Submit', who: 'Meera · freelancer', url: 'payguard.app/projects/kiln', title: 'Uploading ends in a deadline for the client', why: 'Each file gets a protected preview automatically. Submitting tells her exactly when the client\'s window closes, so "when will I hear back?" has an answer.' },
+    { rail: 'Review', who: 'Arjun · client', url: 'payguard.app/p/kiln-x7/review/1', title: 'He reviews with a clear date and two honest options', why: 'The reply-by date is the biggest thing on the panel. Approve is the filled button; asking for changes shows how many rounds remain. Try both. The watermark is visible and the page says why.' },
+    { rail: 'Paid', who: 'Both', url: 'payguard.app', title: 'Approval releases the files and the money', why: 'Arjun gets his originals and a receipt. Meera sees the money released and the next milestone waiting on funding. One approval, both sides updated.' }
+  ];
+
+  /* ---------- render ---------- */
+  function setStep(n) {
+    S.step = n; S.uploading = false; S.rc = false; S.rcSent = false; S.busy = false;
+    S.m1 = n <= 5 ? 'draft' : n <= 7 ? 'funded' : n === 8 ? 'submitted' : 'released';
+    S.uploaded = n >= 7;
+    S.calMonth = n === 9 ? new Date(2026, 9, 1) : new Date(2026, 9, 1);
+    render(true);
+  }
+  function render(scroll) {
+    var st = STEPS[S.step];
+    document.getElementById('rail').innerHTML = STEPS.slice(1).map(function (s, i) {
+      var n = i + 1;
+      return '<button data-action="goto" data-n="' + n + '"' + (n === S.step ? ' aria-current="step"' : '') + ' class="' + (n < S.step ? 'done' : '') + '"><span class="n">' + (n < S.step ? '✓' : n) + '</span>' + s.rail + '</button>';
+    }).join('');
+    document.getElementById('narr').innerHTML = '<div><span class="who">' + st.who + '</span><h2>' + st.title + '</h2><div class="nav"><button class="btn ghost" data-action="prev"' + (S.step === 1 ? ' disabled style="opacity:.4"' : '') + '>← Back</button><button class="btn" data-action="next"' + (S.step === 9 ? ' disabled style="opacity:.4"' : '') + '>Next →</button></div></div><div class="why"><b>Why it works this way</b>' + st.why + '</div>';
+    document.getElementById('url').textContent = st.url;
+    document.getElementById('screen').innerHTML = SCREENS[S.step]();
+    var cur = document.querySelector('#rail [aria-current]');
+    if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-action]');
+    if (!a) return;
+    var act = a.dataset.action;
+    if (act === 'noop') { e.preventDefault(); return; }
+    if (act === 'goto') setStep(Number(a.dataset.n));
+    else if (act === 'next') { if (S.step < 9) setStep(S.step + 1); }
+    else if (act === 'prev') { if (S.step > 1) setStep(S.step - 1); }
+    else if (act === 'calnav') { S.calMonth = new Date(S.calMonth.getFullYear(), S.calMonth.getMonth() + Number(a.dataset.dir), 1); refreshCal(); }
+    else if (act === 'brand') { S.brand = Number(a.dataset.i); render(); }
+    else if (act === 'uploadstart') { S.uploading = true; render(); setTimeout(function () { if (S.step === 6 && S.uploading) setStep(7); }, 1300); }
+    else if (act === 'rc') { S.rc = !S.rc; render(); }
+    else if (act === 'sendrc') { S.rc = false; S.rcSent = true; render(); }
+    else if (act === 'pay') { e.preventDefault(); if (S.busy) return; S.busy = true; render(); setTimeout(function () { if (S.step === 5) setStep(6); }, 900); }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'agree') { S.agree = e.target.checked; document.getElementById('cont').disabled = !S.agree; }
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target, i = t.dataset && t.dataset.ms;
+    if (i === undefined) return;
+    var f = t.dataset.f; S.ms[i][f] = f === 'amount' ? Number(String(t.value).replace(/[^0-9]/g, '')) : t.value;
+    if (f === 'due' && t.value) { var d = parse(t.value); if (d.getFullYear() === S.calMonth.getFullYear() || true) S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
+    var ordered = S.ms.every(function (m, k) { return k === 0 || !m.due || !S.ms[k - 1].due || m.due >= S.ms[k - 1].due; });
+    var w = document.getElementById('datewarn'); if (w) w.hidden = ordered;
+    var tt = document.getElementById('tot'); if (tt) tt.textContent = inr(total());
+    refreshCal();
+  });
+  document.addEventListener('submit', function (e) { e.preventDefault(); });
+  document.addEventListener('keydown', function (e) {
+    if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' && S.step < 9) setStep(S.step + 1);
+    if (e.key === 'ArrowLeft' && S.step > 1) setStep(S.step - 1);
+  });
+
+  render();
+})();
+</script>
