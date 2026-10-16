@@ -12,4 +12,6 @@ Freelancers and clients lack a shared, reliable way to connect what was agreed, 
 - Auto-approval after a no-reply window, issues and refunds, paid extra rounds of changes, reminders by WhatsApp or email
 - Styled with [Frappe UI](https://frappe-ui.vercel.app/) design tokens and layout patterns
 
+**Live preview while editing:** run `node dev-server.js`, then open http://127.0.0.1:5173. The page reloads whenever a file changes. Other live-reload tools such as `live-server` also work.
+
 Based on the v1 dashboard by a teammate. Names, amounts and fee rates are placeholders.
