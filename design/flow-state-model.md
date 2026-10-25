@@ -144,3 +144,11 @@ Kept as is: per-stage scope lists, rounds and `doExtra`, WhatsApp reminder text,
 3. Defaults for reply window, pay-by window, auto-approve (suggest 3 days, 7 days, on).
 4. Whether originals' expiry after unlock is 60 or 90 days.
 5. Whether the freelancer can see the client's preview views (opened, last seen) in v1.
+
+## 12. Decisions made (20-21 Oct 2026) and what is built in the Nazar prototype
+- **PayGuard holds no money, takes no fee (beta).** Clients pay the freelancer directly by **UPI, QR code or card** (credit or debit). The freelancer's UPI ID is set at onboarding and makes the QR code; the bank account (optional) receives card payments.
+- **Unlock only after payment.** Originals unlock when the balance is paid. The freelancer can also unlock early ("Mark as paid" for another way, or "Unlock anyway"). Every critical choice sits with the freelancer.
+- **Freelancer sets the terms per project:** advance (none, 10, 25, 50 or custom %), balance due within N days of approval, unlock **stage by stage** or **once for the whole project** (suggested by stage count), plus reply window, auto-approve and rounds, each with a custom option.
+- **Contract first.** After Plan, a contract is generated, the freelancer signs (draw or type), it goes to the client with the link, and work starts only after the client signs too (and pays any advance).
+- Stage states now: Not started, In progress, In review, Changes requested, **Awaiting payment**, **Unlocked**, On hold. Refunds are gone.
+- Open: legal review of the contract template and of provider rules for paying freelancers directly; chargebacks after unlock.

@@ -1,0 +1,221 @@
+/* ==========================================================================
+   PAYGUARD — TACTILE BOUTIQUE DESIGN SYSTEM
+   Aesthetic: Warm Studio Paper, Tactile Stationery, Folder Tabs, Doodles
+   Typography: Plus Jakarta Sans, Caveat (Handwritten), JetBrains Mono
+   ========================================================================== */
+
+:root {
+  /* Paper Canvas & Surfaces */
+  --bg-canvas: #f6f7f9;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f4f8;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hand: 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Text Colors */
+  --text-main: #181d27;
+  --text-secondary: #535862;
+  --text-muted: #717680;
+  --text-ink: #1e3a8a;
+
+  /* PayGuard Cobalt Identity */
+  --color-primary: #1d4ed8;
+  --color-primary-light: #eff6ff;
+  --color-primary-border: #bfdbfe;
+
+  /* Phase 1: Peach (Discovery) */
+  --phase-peach-tab: #fed7aa;
+  --phase-peach-bg: #fffbf7;
+  --phase-peach-border: #fdba74;
+  --phase-peach-text: #9a3412;
+
+  /* Phase 2: Sky Blue (Conceptualization) */
+  --phase-sky-tab: #bae6fd;
+  --phase-sky-bg: #f8fcff;
+  --phase-sky-border: #7dd3fc;
+  --phase-sky-text: #0369a1;
+
+  /* Phase 3: Lavender (Refinement) */
+  --phase-lavender-tab: #ddd6fe;
+  --phase-lavender-bg: #faf7ff;
+  --phase-lavender-border: #c4b5fd;
+  --phase-lavender-text: #6d28d9;
+
+  /* Phase 4: Mint Green (Delivery) */
+  --phase-mint-tab: #bbf7d0;
+  --phase-mint-bg: #f5fdf8;
+  --phase-mint-border: #86efac;
+  --phase-mint-text: #15803d;
+
+  /* Tactile Shadows */
+  --shadow-paper: 0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  --shadow-lift: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 16px 36px -6px rgba(0, 0, 0, 0.1);
+  --shadow-sticker: 0 3px 10px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  /* Radii */
+  --radius-tab: 14px 14px 0 0;
+  --radius-card: 20px;
+  --radius-pill: 9999px;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Typography Utilities */
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Rubber Stamp Effect */
+.rubber-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  border: 1.5px solid currentColor;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.stamp-funded {
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+  border-color: #0284c7;
+}
+
+.stamp-released {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.08);
+  border-color: #16a34a;
+}
+
+.stamp-review {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.08);
+  border-color: #d97706;
+}
+
+/* Handwritten Pencil Annotation with Arrow */
+.hand-annotation {
+  font-family: var(--font-hand);
+  font-size: 18px;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transform: rotate(-2deg);
+  user-select: none;
+}
+
+/* Buttons */
+.btn-tactile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-tactile-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: #1e40af;
+}
+
+.btn-tactile-primary:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+}
+
+.btn-tactile-secondary {
+  background: #ffffff;
+  color: var(--text-main);
+  border-color: #e2e8f0;
+}
+
+.btn-tactile-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Buddy: the PayGuard mascot. Ink and paper colors are themeable per use.
+   ========================================================================== */
+:root {
+  --mk-ink: #0a39b8;
+  --mk-paper: #fffdf5;
+}
+
+.buddy {
+  display: block;
+  flex: none;
+  max-width: none;
+}
+
+.buddy-light {
+  --mk-ink: #a9bfff;
+  --mk-paper: #141a33;
+}
+
+.buddy-chip {
+  display: grid;
+  place-items: center;
+  padding: 4px 6px;
+  border-radius: 12px;
+  background: #fffdf5;
+  border: 1px solid #dfe6fb;
+}
+
+.buddy-pop {
+  animation: buddy-pop 0.7s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  transform-origin: 50% 90%;
+}
+
+@keyframes buddy-pop {
+  0% { opacity: 0; transform: translateY(14px) scale(0.6) rotate(-6deg); }
+  60% { opacity: 1; transform: translateY(-4px) scale(1.06) rotate(2deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buddy-pop { animation: none; }
+}

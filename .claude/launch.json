@@ -1,0 +1,53 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "prototype",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5188",
+        "--directory",
+        "/Users/prayanipohekar/PayGuard/prototype"
+      ],
+      "port": 5188
+    },
+    {
+      "name": "prototype-test",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5189",
+        "--directory",
+        "/Users/prayanipohekar/PayGuard/prototype"
+      ],
+      "port": 5189
+    },
+    {
+      "name": "nazar",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5190",
+        "--directory",
+        "/Users/prayanipohekar/PayGuard/prototype/nazar"
+      ],
+      "port": 5190
+    },
+    {
+      "name": "nazar-v6",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5191",
+        "--directory",
+        "/Users/prayanipohekar/PayGuard/prototype/nazar-v6"
+      ],
+      "port": 5191
+    }
+  ]
+}

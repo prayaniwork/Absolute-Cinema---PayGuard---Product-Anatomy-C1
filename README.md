@@ -1,15 +1,32 @@
-# PayGuard
+# React + TypeScript + Vite
 
-Freelancers and clients lack a shared, reliable way to connect what was agreed, what was delivered, what was approved, and what is owed. PayGuard keeps each project's scope, deliveries, approvals and payments in one place.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Prototype
+Currently, two official plugins are available:
 
-`index.html` is a clickable prototype of the freelancer and client experience. Open it in a browser; no build step or server is needed. Data is stored in your browser, and **Restart** in the bottom bar resets it.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-- **Freelancer:** Today, Clients, Calendar, Payments, project pages and planning a new project
-- **Client:** invite, checkout, review and approval
-- Each stage lists what it includes, and the client agrees to it before funding
-- Auto-approval after a no-reply window, issues and refunds, paid extra rounds of changes, reminders by WhatsApp or email
-- Styled with [Frappe UI](https://frappe-ui.vercel.app/) design tokens and layout patterns
+## React Compiler
 
-Based on the v1 dashboard by a teammate. Names, amounts and fee rates are placeholders.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
+```
+
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
