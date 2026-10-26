@@ -692,21 +692,92 @@
       '<div class="tabs" style="margin:8px 0 10px"><button aria-selected="true">Needs you <span class="muted">' + need.length + '</span></button><button>Waiting</button><button>Coming up</button></div>' +
       '<div class="lv" style="padding:0"><div class="lv-head" style="--cols:' + cols + '"><span>Client</span><span>Status</span><span style="text-align:right" class="hide-sm">Amount</span><span></span></div>' + rows + '</div></div></div></div>';
   }
-  function sLanding() {
-    var faces = seedProjects().slice(0, 5).map(function (p) { return avatarFor(p); }).join('');
-    return '<div class="lp" ' + brandStyle() + '><header class="lp-nav"><span class="logo">' + mark() + 'PayGuard</span><nav class="lp-links"><button class="linkb" data-a="scroll" data-t="how">How it works</button><button class="linkb" data-a="scroll" data-t="why">Why PayGuard</button></nav><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost" data-a="start">Sign in</button><button class="btn" data-a="start">Get started</button></div></header>' +
-      '<section class="lp-hero"><p class="lbl">For freelance designers with 5 to 15 clients</p><h1>Run your freelance business like a business.</h1><p class="sub">Clients, projects, approvals and payments in one place. No more chasing on WhatsApp.</p>' +
-      '<div class="lp-cta"><button class="btn lg" data-a="start">Get started ' + ico('chev') + '</button><button class="btn lg outline" data-a="peek">See a busy day</button></div><p class="muted" style="font-size:var(--t1)">Your clients don\'t need an account.</p></section>' +
-      '<section class="lp-shotwrap">' + shotHTML() + '</section>' +
-      '<section class="lp-sec" id="why"><div class="lp-head"><p class="lbl">Why PayGuard</p><h2>Know who needs you. Skip the chasing.</h2></div><div class="lp-grid">' +
-      '<div class="card lp-card lead"><div class="lp-frag"><span class="faces">' + faces + '</span><span class="badge outline">4 need you today</span></div><h3>See every client at a glance</h3><p class="muted">Who needs you, who you\'re waiting on, and what\'s next.</p></div>' +
-      '<div class="card lp-card"><div class="lp-frag"><span class="linkchip">' + ico('link') + 'payguard.app/p/kiln-x7</span></div><h3>Send one link, skip the follow-ups</h3><p class="muted">Your client reviews, approves and pays in one place.</p></div>' +
-      '<div class="card lp-card"><div class="lp-frag"><span class="mono">₹40,000</span><span class="badge released">Unlocked</span></div><h3>Get paid, straight to you</h3><p class="muted">Clients pay you by UPI, QR or card. Originals unlock when they do.</p></div></div></section>' +
-      '<section class="lp-sec" id="how"><div class="lp-head"><p class="lbl">How it works</p><h2>From plan to paid in four steps</h2></div><ol class="lp-steps">' +
-      '<li><i>1</i><b>Plan the project</b><span>Set the scope, price and date for each deliverable.</span></li><li><i>2</i><b>Both sign a contract</b><span>Then any advance you ask for is paid to you.</span></li><li><i>3</i><b>You deliver</b><span>Upload your files. Clients review a watermarked preview.</span></li><li><i>4</i><b>Client approves and pays</b><span>By UPI, QR or card, straight to you. The originals unlock.</span></li></ol></section>' +
-      '<section class="lp-sec"><div class="card lp-final"><div>' + buddy('thumbs', 120) + '</div><div class="lp-finaltext"><h2>Start with your first client.</h2><p class="muted">Takes about 2 minutes.</p></div><button class="btn lg" data-a="start">Get started ' + ico('chev') + '</button></div></section>' +
-      '<footer class="lp-foot"><span class="logo">' + mark() + 'PayGuard</span><span class="muted" style="font-size:var(--t1)">Prototype. All names and amounts are samples.</span></footer></div>';
+  /* ---------------- landing ---------------- */
+  function lcOut() {
+    var c = U.lc || (U.lc = { n: 8, a: 60000, d: 14 }), wait = c.n * c.a * Math.min(1, c.d / 30), hrs = c.n * (c.d / 3) * 10 / 60;
+    var w = wait >= 100000 ? '₹' + (wait / 100000).toFixed(1).replace('.0', '') + ' lakh' : inr(Math.round(wait / 1000) * 1000);
+    return { w: w, hn: hrs, h: hrs < 1 ? 'under an hour' : 'about ' + Math.round(hrs) + (Math.round(hrs) === 1 ? ' hour' : ' hours') };
   }
+  function lcFun() {
+    var c = U.lc || {}, o = lcOut();
+    if (!c.d) return 'Your clients pay on time? Please tell us your secret.';
+    if (c.d >= 55 && c.n >= 18) return 'Okay, that is a lot. Sit down, we will handle it. 🫠';
+    if (o.hn >= 10) return 'That is a few full movie nights a month, spent typing "just checking in". 🍿';
+    if (o.hn >= 4) return 'About one movie night of nagging, every month. 🎬';
+    return 'Not terrible. Still not how you want to spend a Saturday.';
+  }
+  function lmText() {
+    var m = U.lm || (U.lm = { tone: 'friendly', name: 'Sana', amt: 35000, what: 'Concepts', days: 6 });
+    var d = m.days + (m.days === 1 ? ' day' : ' days'), t = {
+      friendly: 'Hi ' + m.name + ', hope your week is going well! A quick nudge on the ' + inr(m.amt) + ' for ' + m.what + '. It was due ' + d + ' ago. You can pay by UPI here: [your pay link]. Thank you!',
+      firm: 'Hi ' + m.name + ', the payment of ' + inr(m.amt) + ' for ' + m.what + ' is now ' + d + ' overdue. Please clear it by [date] so I can release the final files. UPI link: [your pay link].',
+      final: 'Hi ' + m.name + ', this is a final reminder for ' + inr(m.amt) + ' (' + m.what + '), ' + d + ' overdue. The files stay locked until payment is received. Please pay today so delivery isn\'t delayed. UPI link: [your pay link].',
+      drama: 'Dear ' + m.name + ', it is with a heavy heart that I write. ' + inr(m.amt) + ' for ' + m.what + ' has been waiting ' + d + ' now, and my chai has gone cold. 🎭 Restore my faith in humanity here: [your pay link].'
+    };
+    return t[m.tone];
+  }
+  function coinRain(n) {
+    for (var i = 0; i < n; i++) { var e = document.createElement('span'); e.className = 'l6-rain'; e.textContent = '₹'; e.style.cssText = 'left:' + (Math.random() * 100) + 'vw;animation-delay:' + (Math.random() * .9) + 's;font-size:' + (18 + Math.random() * 24) + 'px'; document.body.appendChild(e); (function (x) { setTimeout(function () { x.remove(); }, 3400); })(e); }
+  }
+  function setMom(i) {
+    U.lmi = i;
+    [].forEach.call(document.querySelectorAll('.l6-sc'), function (e, j) { e.classList.toggle('on', j === i); });
+    [].forEach.call(document.querySelectorAll('.l6-mt'), function (e, j) { e.setAttribute('aria-selected', String(j === i)); });
+  }
+  function setStep(i) {
+    U.lsi = i;
+    [].forEach.call(document.querySelectorAll('.l6-sp'), function (e, j) { e.classList.toggle('on', j === i); });
+    [].forEach.call(document.querySelectorAll('.l6-nd'), function (e, j) { e.classList.toggle('on', j === i); e.classList.toggle('done', j < i); });
+    var c = document.querySelector('.l6-coin'); if (c) c.style.left = (i * 100 / 3) + '%';
+    var pr = document.querySelector('.l6-prog'); if (pr) pr.style.width = (i * 100 / 3) + '%';
+    var bp = document.querySelector('[data-a="stp"][data-k="p"]'), bn = document.querySelector('[data-a="stp"][data-k="n"]');
+    if (bp) bp.disabled = i === 0; if (bn) bn.disabled = i === 3;
+  }
+  function l6init() {
+    if (window.__l6) return; window.__l6 = 1;
+    document.addEventListener('mouseover', function (e) { U.lhold = !!(e.target.closest && e.target.closest('.l6-hold')); });
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    setInterval(function () { if (document.querySelector('.l6') && !U.lhold) setMom(((U.lmi || 0) + 1) % 3); }, 8000);
+    setInterval(function () { if (document.querySelector('.l6') && !U.lhold) setStep(((U.lsi || 0) + 1) % 4); }, 6000);
+  }
+  function lpScreen(v) {
+    if (v === 'client') return '<div class="l6-scr"><div class="l6-bar"><span class="l6-dotk"></span>Meera Iyer Studio<em>Brand refresh</em></div><div class="l6-clientbody"><div class="l6-prev"><span class="l6-wm">PREVIEW · SANA QURESHI</span><span class="l6-wm w2">PREVIEW · SANA QURESHI</span><b>Concepts</b><i>Three directions, watermarked</i></div><div class="l6-side"><div class="l6-lock">' + ico('lock') + '<span>Originals unlock when you pay</span></div><span class="btn lg" style="width:100%">Approve</span><span class="btn lg outline" style="width:100%;margin-top:8px">Ask for changes</span><div class="l6-pay"><span>Then pay Meera</span><b>₹35,000</b></div><small>UPI, QR or card. No account needed.</small></div></div></div>';
+    return '<div class="l6-scr"><div class="l6-bar"><span class="l6-dotk"></span>Today<em>Sunday, 25 October</em></div><div class="l6-me"><div class="l6-kpi"><span>Received this month</span><b>₹2,43,000</b></div><div class="l6-kpi"><span>Late</span><b class="late">₹62,000</b></div></div><div class="l6-list"><div><i>NC</i><span><b>Remind Sana: payment 4 days late</b><em>Northwind Cafe · Concepts</em></span><span class="btn sm">Remind</span></div><div><i>BS</i><span><b>Approval 1 day late</b><em>Bloom Studio · Homepage design</em></span><span class="btn sm">Remind</span></div><div><i>AL</i><span><b>Upload previews: due in 2 days</b><em>Acme Logistics · UI kit</em></span><span class="btn sm outline">Upload</span></div></div></div>';
+  }
+  function sLanding() {
+    l6init();
+    var v = U.lpv || 'you', o = lcOut(), c = U.lc || (U.lc = { n: 8, a: 60000, d: 14 }), m = U.lm || (U.lm = { tone: 'friendly', name: 'Sana', amt: 35000, what: 'Concepts', days: 6 });
+    var mi = U.lmi || 0, si = U.lsi || 0;
+    var faq = [['Do my clients need an account?', 'No. They open your link, review a watermarked preview, sign and pay. That is all.'], ['Where does the money go?', 'Straight from your client to your UPI ID or bank account. PayGuard never holds it.'], ['What does it cost?', 'Free during the beta, with no fee on payments. We will tell you well before that changes.'], ['What if a client says they don\'t like the work?', 'They can ask for changes within the rounds you set, or report a problem. You see it and reply, and approval waits until it is sorted.'], ['What does my client see before paying?', 'A watermarked preview. The original files unlock when they pay, or earlier if you choose to unlock them.'], ['Is the contract legally binding?', 'It is a clear written agreement that you both sign electronically. It is a starting template, not legal advice, so have a lawyer review it for large projects.'], ['Can I use my own letterhead and clauses?', 'Yes. Add your header and your own clauses in Settings, and every contract uses them.']];
+    var cf = ''; for (var i = 0; i < 10; i++) cf += '<i class="l6-cf" style="--x:' + Math.round(Math.cos(i * 0.628) * 90) + 'px;--y:' + Math.round(Math.sin(i * 0.628) * 70) + 'px;--h:' + (i * 36) + '"></i>';
+    var moms = [['The nagging stops', 'No more "any update?"'], ['Files unlock', 'When the money lands'], ['Client side', 'Approve, then pay']];
+    var scA = '<div class="l6-chatw"><div class="l6-ch"><i>SQ</i>Sana Qureshi<em>Client</em></div><div class="l6-bub me l6-a" style="--d:.3s">Hi Sana, just checking on the payment 🙂</div><div class="l6-bub me l6-a" style="--d:.9s">Any update?</div><div class="l6-bub me l6-a" style="--d:1.5s">Sorry to chase again… 😩</div></div><div class="l6-stamp">NOT ANYMORE</div><div class="l6-auto2 l6-a" style="--d:3s">' + ico('bell') + '<span><b>PayGuard reminded Sana</b><em>Automatic, with her pay link</em></span></div><div class="l6-bub them l6-a" style="--d:4.2s">Paying now 🙏</div><div class="l6-got l6-a" style="--d:5s">₹35,000 received ✓</div>';
+    var scB = '<div class="l6-fwrap"><div class="l6-fcard"><div class="l6-lay lk">' + ico('lock') + '<span><b>Concepts.zip</b><em>Preview only · watermarked</em></span></div><div class="l6-lay un">' + ico('unlock') + '<span><b>Concepts.zip</b><em>Original unlocked ✓</em></span></div></div><div class="l6-coinfly">₹35,000</div>' + cf + '</div><p class="l6-scap l6-a" style="--d:2.2s">Your client gets the originals the moment they pay.</p>';
+    var scC = '<div class="l6-ph"><div class="l6-phb"><span class="l6-dotk"></span>Meera Iyer Studio</div><div class="l6-prev sm"><span class="l6-wm">PREVIEW</span><b>Concepts</b></div><div class="l6-sw"><span class="btn lg outline l6-ap"><span class="a">Approve<i class="rp" style="--d:1.2s"></i></span><span class="b">Approved ✓</span></span></div><div class="l6-sw"><span class="btn lg l6-pbtn"><span class="a">Pay ₹35,000<i class="rp" style="--d:2.6s"></i></span><span class="b">Paid ✓</span></span></div><div class="l6-note2"><span class="a">' + ico('lock') + 'Originals unlock when you pay</span><span class="b">' + ico('unlock') + 'Originals unlocked</span></div></div>';
+    var sc = [scA, scB, scC];
+    var steps = [
+      ['You', 'Plan the project', 'Deliverables, prices, dates, and how you want to be paid. Two minutes, roughly.', '<div class="l6-chips"><span>Logo · ₹20,000</span><span>Brand guide · ₹15,000</span><span class="b">Half and half</span></div>'],
+      ['You and your client', 'Sign the contract', 'You both sign before work starts. Any advance goes straight to you.', '<div class="l6-sign"><div><svg viewBox="0 0 120 40"><path d="M6 28 C16 6 22 36 32 18 S48 10 56 26 S78 30 92 14" /></svg><span>Meera</span></div><div><svg viewBox="0 0 120 40"><path style="animation-delay:1.1s" d="M8 22 C18 10 26 34 38 20 S60 8 70 24 S96 28 112 12" /></svg><span>Sana</span></div></div><p class="l6-mini2">Advance ₹17,500 → straight to your UPI</p>'],
+      ['You', 'Deliver', 'Upload your work. Your client gets a watermarked preview to review.', '<div class="l6-up"><div class="l6-fl">' + ico('lock') + 'Concepts.zip</div><div class="l6-bar2"><i></i></div><p class="l6-mini2">Preview ready for Sana ✓</p></div>'],
+      ['Your client', 'Approve and pay', 'UPI, QR or card. The moment it lands, the originals unlock.', '<div class="l6-paidc"><b>₹35,000</b><span>Paid by Sana ✓</span><em>' + ico('unlock') + 'Originals unlocked</em></div>']
+    ];
+    var nodes = steps.map(function (x, i) { return '<button type="button" class="l6-nd' + (i === si ? ' on' : '') + (i < si ? ' done' : '') + '" data-a="stp" data-k="' + i + '" style="left:' + (i * 100 / 3) + '%"><i>' + (i + 1) + '</i><span>' + x[1] + '</span></button>'; }).join('');
+    var panels = steps.map(function (x, i) { return '<div class="l6-sp' + (i === si ? ' on' : '') + '"><div class="l6-spt"><span class="who ' + (i === 0 || i === 2 ? 'you' : i === 1 ? 'both' : 'cli') + '">' + x[0] + '</span><h3>' + x[1] + '</h3><p>' + x[2] + '</p></div><div class="l6-spv">' + x[3] + '</div></div>'; }).join('');
+    return '<div class="lp l6" ' + brandStyle() + '><header class="l6-nav"><span class="logo" data-a="logo5" style="cursor:pointer">' + mark() + 'PayGuard</span><nav class="l6-links"><button class="linkb" data-a="scroll" data-t="moments">Watch it work</button><button class="linkb" data-a="scroll" data-t="how">How it works</button><button class="linkb" data-a="scroll" data-t="check">Your numbers</button><button class="linkb" data-a="scroll" data-t="faq">FAQ</button></nav><div style="display:flex;gap:6px;align-items:center"><button class="btn ghost" data-a="start">Sign in</button><button class="btn" data-a="start">Get started</button></div></header>' +
+      '<section class="l6-hero"><p class="l6-eye"><span>For independent designers, developers and writers in India</span></p><h1>You\'ve done the work.<br>Don\'t also do the <span class="l6-nag" data-a="nag">nagging<svg viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M3 18 C60 6 120 26 180 12 S270 8 297 16"/></svg><em class="l6-hw">gone!</em></span></h1><p class="l6-sub">Share one link. Your client reviews a watermarked preview and pays you on UPI. The original files unlock when the money lands.</p><div class="l6-cta"><button class="btn lg" data-a="start">Get started ' + ico('chev') + '</button><button class="linkb l6-soft" data-a="peek">Or poke around with sample clients →</button></div><ul class="l6-pills"><li>' + ico('check', '') + 'Clients need no account</li><li>' + ico('check', '') + 'Money goes straight to you</li><li>' + ico('check', '') + 'No fee in the beta</li></ul>' +
+      '<div class="l6-demo"><span class="l6-stk s1">any update?? 🙃</span><span class="l6-stk s2">₹35,000 landed ✓</span><button type="button" class="l6-stk s3" data-a="coins" aria-label="Make it rain">₹</button><div class="l6-tgl" role="group" aria-label="Whose screen"><button type="button" data-a="lpview" data-k="you" aria-pressed="' + (v === 'you') + '">Your side</button><button type="button" data-a="lpview" data-k="client" aria-pressed="' + (v === 'client') + '">Your client\'s side</button></div>' + lpScreen(v) + '</div></section>' +
+      '<section class="l6-sec" id="moments"><div class="l6-h"><p class="l6-tag">Watch it work</p><h2>Three moments, minus the awkwardness</h2></div><div class="l6-hold"><div class="l6-mtabs" role="tablist">' + moms.map(function (x, i) { return '<button type="button" role="tab" class="l6-mt" aria-selected="' + (i === mi) + '" data-a="mom" data-k="' + i + '"><b>' + x[0] + '</b><span>' + x[1] + '</span></button>'; }).join('') + '</div><div class="l6-stage">' + sc.map(function (x, i) { return '<div class="l6-sc' + (i === mi ? ' on' : '') + '">' + x + '</div>'; }).join('') + '</div><p class="l6-hint">Auto-plays. Hover to pause, or tap a tab.</p></div></section>' +
+      '<section class="l6-sec l6-alt" id="how"><div class="l6-h"><p class="l6-tag">How it works</p><h2>From plan to paid</h2></div><div class="l6-hold"><div class="l6-track"><div class="l6-line"><i class="l6-prog" style="width:' + (si * 100 / 3) + '%"></i></div>' + nodes + '<span class="l6-coin" style="left:' + (si * 100 / 3) + '%">₹</span></div><div class="l6-panels">' + panels + '</div><div class="l6-nav2"><button type="button" class="btn outline sm" data-a="stp" data-k="p"' + (si === 0 ? ' disabled' : '') + '>Back</button><button type="button" class="btn sm" data-a="stp" data-k="n"' + (si === 3 ? ' disabled' : '') + '>Next</button></div></div></section>' +
+      '<section class="l6-sec" id="check"><div class="l6-h"><p class="l6-tag">Be honest with yourself</p><h2>How much is stuck with clients?</h2><p>A rough estimate. Nothing to sign up for.</p></div><div class="l6-calc"><div class="l6-ci"><label>Clients at a time<output id="lc-nv">' + c.n + '</output></label><input type="range" min="1" max="20" step="1" value="' + c.n + '" data-lc="n"><label>Average project size<output id="lc-av">' + inr(c.a) + '</output></label><input type="range" min="10000" max="300000" step="5000" value="' + c.a + '" data-lc="a"><label>Days a payment is usually late<output id="lc-dv">' + c.d + ' days</output></label><input type="range" min="0" max="60" step="1" value="' + c.d + '" data-lc="d"></div><div class="l6-co"><p class="l6-q">Waiting on clients, at any time</p><b id="lc-w">' + o.w + '</b><p class="l6-q">Spent chasing, every month</p><b id="lc-h">' + o.h + '</b><p class="l6-fun" id="lc-fun">' + lcFun() + '</p></div></div><p class="l6-fine">Estimate. Assumes each client pays you about one project a month, and a follow-up every 3 days a payment is late, 10 minutes each.</p></section>' +
+      '<section class="l6-sec l6-alt" id="tool"><div class="l6-h"><p class="l6-tag">Free, no sign-up</p><h2>The reminder you don\'t have to agonise over</h2><p>PayGuard sends these for you, pay link included. Or just steal the wording.</p></div><div class="l6-gen"><div class="l6-gi"><div class="l6-gt" role="group" aria-label="Tone">' + [['friendly', 'Friendly'], ['firm', 'Firm'], ['final', 'Final notice'], ['drama', 'Dramatic 🎭']].map(function (x) { return '<button type="button" data-a="lmtone" data-k="' + x[0] + '" aria-pressed="' + (m.tone === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div><div class="l6-gf"><label>Client first name<input class="input" data-lm="name" value="' + esc(m.name) + '"></label><label>Amount (₹)<input class="input" inputmode="numeric" data-lm="amt" value="' + m.amt + '"></label><label>For<input class="input" data-lm="what" value="' + esc(m.what) + '"></label><label>Days late<input class="input" inputmode="numeric" data-lm="days" value="' + m.days + '"></label></div></div><div class="l6-go"><div id="lm-out" class="l6-msg">' + esc(lmText()) + '</div><button type="button" class="btn outline" data-a="lpcopy">' + ico('copy') + 'Copy message</button></div></div></section>' +
+      '<section class="l6-sec" id="honest"><div class="l6-h"><p class="l6-tag">No fine print</p><h2>What we do, and what we don\'t</h2></div><div class="l6-notes"><div class="l6-note n1"><b>We don\'t hold your money.</b><p>It goes from your client straight to you.</p></div><div class="l6-note n2"><b>We don\'t take a cut.</b><p>Free in the beta, no fee on payments.</p></div><div class="l6-note n3"><b>We can\'t make a client pay.</b><p>But nothing leaves your hands until they do.</p></div></div>' +
+      '<div class="l6-learn"><p class="l6-tag">Where we are</p><h3>In beta, built with freelancers in India</h3><p class="l6-lead">From early research (public posts and articles; freelancer interviews are next):</p><ul><li><b>Late payment is mostly a queue, not a quarrel.</b> Clients wait on their own approvals and cash flow far more than they mean to ignore you.</li><li><b>Freelancers worry about handing over source files before they are paid.</b></li><li><b>Clients worry about paying upfront with nothing to show.</b> So the link shows a preview first.</li></ul></div></section>' +
+      '<section class="l6-sec l6-alt" id="faq"><div class="l6-h"><h2>Questions people ask</h2></div><div class="l6-faq">' + faq.map(function (q) { return '<details><summary>' + q[0] + ico('chev', 'fc') + '</summary><p>' + q[1] + '</p></details>'; }).join('') + '</div></section>' +
+      '<section class="l6-final"><h2>Start with one client.</h2><p>About two minutes. Free during the beta.</p><button class="btn lg" data-a="start">Get started ' + ico('chev') + '</button></section>' +
+      '<footer class="l6-foot"><span class="logo">' + mark() + 'PayGuard</span><button type="button" class="linkb" data-a="coins">Made in India, with too much chai ☕</button><span class="muted">Prototype: names, amounts and payments are samples.</span><nav><button class="linkb">Privacy</button><button class="linkb">Terms</button><button class="linkb">Contact</button></nav></footer></div>';
+  }
+
   function setupOk() { return !!U.agree && /^[\w.\-]{2,}@[A-Za-z]{2,}$/.test(String(S().payout.upi || '').trim()); }
   function sSetup() {
     var s = D.studio, ok = setupOk(), pay = S().payout;
@@ -1818,7 +1889,7 @@
       wide = true; var p7 = getP(o.pid) || P();
       body = '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2>Contract</h2><p class="muted">' + esc(p7.name) + '</p></div><button class="btn ghost sm" data-a="close" aria-label="Close">' + ico('x') + '</button></div>' + contractHTML(p7) + '<div class="dfoot"><button class="btn" data-a="close">Close</button></div>';
     }
-    return '<div class="overlay" data-a="overlay" role="dialog" aria-modal="true"><div class="dialog' + (wide ? ' wide' : '') + '"><button type="button" class="g6-x" data-a="close" aria-label="Close" data-tip="Close">' + ico('x', '') + '</button>' + body + '</div></div>';
+    return '<div class="overlay" data-a="overlay" role="dialog" aria-modal="true"><div class="dialog' + (wide ? ' wide' : '') + '"><button type="button" class="g6-x" data-a="close" aria-label="Close">' + ico('x', '') + '</button>' + body + '</div></div>';
   }
 
   /* ---------------- feedback note: selection-actions bar ----------------
@@ -2108,6 +2179,14 @@
     if (act === 'skyline') { U.sky = null; U.modal = { t: 'sky' }; render(); return; }
     if (act === 'linktgl') { U.linkOpen = !U.linkOpen; render(); var li0 = document.getElementById('lnk'); if (li0) li0.focus(); return; }
     if (act === 'back') { goBack(); return; }
+    if (act === 'mom') { setMom(Number(a.dataset.k)); return; }
+    if (act === 'stp') { var kk = a.dataset.k, cur = U.lsi || 0; setStep(Math.max(0, Math.min(3, kk === 'n' ? cur + 1 : kk === 'p' ? cur - 1 : Number(kk)))); return; }
+    if (act === 'coins') { coinRain(36); return; }
+    if (act === 'logo5') { U.lg = (U.lg || 0) + 1; if (U.lg >= 5) { U.lg = 0; coinRain(50); toast('thumbs', 'You found it', 'Imagine this, but every payment.'); } return; }
+    if (act === 'nag') { var pa = a.querySelector('path'); if (pa) { pa.style.animation = 'none'; void pa.getBoundingClientRect(); pa.style.animation = ''; } return; }
+    if (act === 'lpview') { U.lpv = a.dataset.k; var sc0 = window.scrollY; render(); window.scrollTo(0, sc0); return; }
+    if (act === 'lmtone') { (U.lm = U.lm || {}).tone = a.dataset.k; var sc1 = window.scrollY; render(); window.scrollTo(0, sc1); return; }
+    if (act === 'lpcopy') { var tx = lmText(); try { navigator.clipboard.writeText(tx).then(function () { toast('thumbs', 'Copied', 'Paste it into WhatsApp or email.'); }, function () { toast('hello', 'Couldn\'t copy', 'Select the text and copy it.'); }); } catch (er) { toast('hello', 'Couldn\'t copy', 'Select the text and copy it.'); } return; }
     if (act === 'rng') { U.rng = a.dataset.k; render(); return; }
     if (act === 'todof') { U.todoF = a.dataset.k; render(); return; }
     if (act === 'cvnav') { var dr = Number(a.dataset.dir), step = (U.calv || 'month') === 'quarter' ? 3 : 1; U.cal = new Date(U.cal.getFullYear(), U.cal.getMonth() + dr * step, 1); render(); return; }
@@ -2244,6 +2323,8 @@
     if (U.checkout && /^(em|upi|cnum|ex|cv)$/.test(t.id)) { payInput(t); return; }
     if (t.dataset.cv) { var k2 = t.dataset.cv.split(':'); setCS(k2[0], k2[1], Number(String(t.value).replace(/[^0-9]/g, ''))); if (k2[0] === 'd') syncPlanSide(); return; }
     if (t.id === 'sigtype') { U.sig.typed = t.value; var sp = document.getElementById('sigprev'); if (sp) sp.textContent = t.value || ' '; syncSign(); return; }
+    if (t.dataset.lc) { var lc = U.lc || (U.lc = { n: 8, a: 60000, d: 14 }); lc[t.dataset.lc] = Number(t.value); var lo = lcOut(); var q = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }; q('lc-nv', lc.n); q('lc-av', inr(lc.a)); q('lc-dv', lc.d + ' days'); q('lc-w', lo.w); q('lc-h', lo.h); q('lc-fun', lcFun()); return; }
+    if (t.dataset.lm) { var lm = U.lm || (U.lm = {}); var k = t.dataset.lm; lm[k] = (k === 'amt' || k === 'days') ? Number(String(t.value).replace(/[^0-9]/g, '')) || 0 : t.value; var oe = document.getElementById('lm-out'); if (oe) oe.textContent = lmText(); return; }
     if (t.dataset.mt && U.modal && U.modal.m) { U.modal.m[t.dataset.mt] = t.value; return; }
     if (t.dataset.ec && U.modal && U.modal.f) { U.modal.f[t.dataset.ec] = t.value; return; }
     if (t.id === 'note') { U.fb.note = t.value; return; }
